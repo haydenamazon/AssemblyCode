@@ -1,0 +1,52 @@
+     1                                  ; Hayden
+     2                                  ; P5
+     3                                  ; 10/15/23
+     4                                  ; Etc... ... 
+     5                                  
+     6                                  SECTION .data
+     7                                  ; define data/variables here.  Think DB, DW, DD, DQ
+     8 00000000 00000000                Fibs: DD 0
+     9                                  SECTION .bss
+    10                                  ; define uninitialized data here
+    11 00000000 <res 00000004>          MaxFib: RESD 1
+    12 00000004 <res 00000002>          FibCount: RESW 1
+    13                                  
+    14                                  SECTION .text
+    15                                  global _main
+    16                                  _main:
+    17                                  
+    18 00000000 66C705[04000000]00-     mov word [FibCount], 0
+    19 00000008 00                 
+    20 00000009 C705[00000000]0100-     mov dword [MaxFib], 1
+    21 00000011 0000               
+    22                                  
+    23                                  loop:
+    24 00000013 FF05[04000000]          	inc dword [FibCount]
+    25                                  	;increases FibCount for every instance in the loop
+    26 00000019 8B0D[00000000]          	mov ecx, [Fibs]
+    27 0000001F 8B15[00000000]          	mov edx, [MaxFib]
+    28 00000025 01D1                    	add ecx, edx
+    29 00000027 7214                    	jc end
+    30                                  	;if there is a carry loop ends, else it continues
+    31                                  
+    32 00000029 8915[00000000]          	mov [Fibs], edx
+    33 0000002F 890D[00000000]          	mov [MaxFib], ecx
+    34                                  
+    35 00000035 6643                    	inc bx
+    36 00000037 6683FB4B                	cmp bx, 75
+    37 0000003B 7ED6                    	jle loop
+    38                                  end:
+    39 0000003D 8B15[00000000]          	mov edx, [Fibs]
+    40 00000043 8915[00000000]          	mov [MaxFib], edx
+    41                                  lastBreak:
+    42                                  
+    43                                  
+    44                                  
+    45                                  ; put your code here.
+    46                                  
+    47                                  
+    48                                  
+    49                                  ; Normal termination code
+    50 00000049 B801000000              mov eax, 1
+    51 0000004E BB00000000              mov ebx, 0
+    52 00000053 CD80                    int 80h
