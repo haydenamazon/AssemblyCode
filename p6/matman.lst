@@ -1,0 +1,98 @@
+     1                                  ; Hayden Amazon
+     2                                  ; P6
+     3                                  ; 10/25/23
+     4                                  ; Etc...... . . . .
+     5                                  
+     6                                  SECTION .data
+     7                                  ; define data/variables here.  Think DB, DW, DD, DQ
+     8                                  ROWS: EQU 5
+     9                                  COLS: EQU 7
+    10                                  ;set each instance of ROWS to 5 upon execution
+    11 00000000 010000000200000003-     MyMatrix: dd  1,  2,  3,  4,  5,  6,  7
+    12 00000009 000000040000000500-
+    13 00000012 000006000000070000-
+    14 0000001B 00                 
+    15 0000001C 08000000090000000A-     	  dd  8,  9, 10, 11, 12, 13, 14
+    16 00000025 0000000B0000000C00-
+    17 0000002E 00000D0000000E0000-
+    18 00000037 00                 
+    19 00000038 0F0000001000000011-     	  dd 15, 16, 17, 18, 19, 20, 21
+    20 00000041 000000120000001300-
+    21 0000004A 000014000000150000-
+    22 00000053 00                 
+    23 00000054 160000001700000018-     	  dd 22, 23, 24, 25, 26, 27, 28
+    24 0000005D 000000190000001A00-
+    25 00000066 00001B0000001C0000-
+    26 0000006F 00                 
+    27 00000070 1D0000001E0000001F-     	  dd 29, 30, 31, 32, 33, 34, 35 
+    28 00000079 000000200000002100-
+    29 00000082 000022000000230000-
+    30 0000008B 00                 
+    31                                  	  ;data set 2
+    32                                  
+    33                                  ;
+    34 0000008C 05000000                CurrROW: dd ROWS
+    35 00000090 07000000                CurrCOL: dd COLS
+    36                                  
+    37                                  SECTION .bss
+    38                                  ; define uninitialized data here
+    39 00000000 <res 00000014>          RowSums: RESD ROWS
+    40 00000014 <res 0000001C>          ColSums: RESD COLS
+    41 00000030 <res 00000004>          GrandTotal: RESD 1 ;0
+    42                                  
+    43                                  SECTION .text
+    44                                  global _main
+    45                                  _main:
+    46                                  
+    47                                  ; put your code here.
+    48                                  col_loop:
+    49 00000000 FF0D[90000000]          	dec dword [CurrCOL]
+    50                                  
+    51 00000006 A1[90000000]            	mov eax, [CurrCOL]
+    52 0000000B 83F8FF                  	cmp eax, -1
+    53 0000000E 7E56                    	jng exit
+    54                                  
+    55                                  	;row counter is reset
+    56 00000010 C705[8C000000]0500-     	mov dword[CurrROW], ROWS
+    57 00000018 0000               
+    58                                  
+    59                                  row_loop:
+    60 0000001A FF0D[8C000000]          	dec dword [CurrROW]
+    61 00000020 A1[8C000000]            	mov eax, [CurrROW]
+    62                                  
+    63 00000025 83F8FF                  	cmp eax, -1
+    64 00000028 7ED6                    	jng col_loop
+    65                                  	;similar to col_loop acts to see if the current row is less than 0
+    66                                  
+    67                                  
+    68 0000002A A1[8C000000]            	mov eax, [CurrROW]
+    69 0000002F BB07000000              	mov ebx, COLS
+    70 00000034 F7E3                    	mul ebx
+    71                                  	
+    72                                  	;adds matrix address
+    73 00000036 0305[90000000]          	add eax, [CurrCOL]
+    74 0000003C BA[00000000]            	mov edx, MyMatrix
+    75                                  
+    76 00000041 8B0C82                  	mov ecx, [edx + eax * 4]
+    77 00000044 010D[30000000]          	add dword [GrandTotal], ecx
+    78                                  
+    79                                  	;gets the sum of the row and then moves into the next row (the * 4)
+    80 0000004A A1[8C000000]            	mov eax, [CurrROW]
+    81 0000004F BA[00000000]            	mov edx, RowSums
+    82 00000054 010C82                  	add [edx + eax * 4], ecx
+    83                                  
+    84                                  	;gets the sum of the column and then moves into the next row (the * 4)
+    85 00000057 A1[90000000]            	mov eax, [CurrCOL]
+    86 0000005C BA[14000000]            	mov edx, ColSums
+    87 00000061 010C82                  	add [edx + eax * 4], ecx
+    88                                  	
+    89                                  	;recursive loop that jumps back to the top until the current row is not greater than the column loop
+    90 00000064 EBB4                    	jmp row_loop
+    91                                  
+    92                                  exit:
+    93                                  
+    94                                  lastBreak:
+    95                                  ; Normal termination code
+    96 00000066 B801000000              mov eax, 1
+    97 0000006B BB00000000              mov ebx, 0
+    98 00000070 CD80                    int 80h
