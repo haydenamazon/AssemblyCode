@@ -1,0 +1,112 @@
+     1                                  ; Hayden Amazon
+     2                                  ; p8
+     3                                  ; NOVEMBER 8th
+     4                                  ; Etc......
+     5                                  
+     6                                  SECTION .data
+     7                                  ; define data/variables here.  Think DB, DW, DD, DQ
+     8 00000000 010000000200000003-     array1: dd      1,2,3,4,5
+     9 00000009 000000040000000500-
+    10 00000012 0000               
+    11                                  len1:   EQU     ($-array1)/4
+    12                                  
+    13                                  
+    14 00000014 F6FFFFFFF7FFFFFFF8-     array2: dd      -10, -9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9
+    15 0000001D FFFFFFF9FFFFFFFAFF-
+    16 00000026 FFFFFBFFFFFFFCFFFF-
+    17 0000002F FFFDFFFFFFFEFFFFFF-
+    18 00000038 FFFFFFFF0000000001-
+    19 00000041 000000020000000300-
+    20 0000004A 000004000000050000-
+    21 00000053 000600000007000000-
+    22 0000005C 0800000009000000   
+    23                                  len2:   EQU     ($-array2)/4
+    24                                  
+    25                                  
+    26 00000064 000000000A00000014-     array3: dd  0,10,20,30,40,50,60,70,80,90
+    27 0000006D 0000001E0000002800-
+    28 00000076 0000320000003C0000-
+    29 0000007F 004600000050000000-
+    30 00000088 5A000000           
+    31 0000008C 640000006E00000078-     	  dd  100,110,120,130,140,150,160,170,180,190
+    32 00000095 000000820000008C00-
+    33 0000009E 000096000000A00000-
+    34 000000A7 00AA000000B4000000-
+    35 000000B0 BE000000           
+    36 000000B4 C8000000D2000000DC-     	  dd  200,210,220,230,240,250,260,270,280,290
+    37 000000BD 000000E6000000F000-
+    38 000000C6 0000FA000000040100-
+    39 000000CF 000E01000018010000-
+    40 000000D8 22010000           
+    41 000000DC 2C0100003601000040-     	  dd  300,310,320,330,340,350,360,370,380,390
+    42 000000E5 0100004A0100005401-
+    43 000000EE 00005E010000680100-
+    44 000000F7 00720100007C010000-
+    45 00000100 86010000           
+    46 00000104 900100009A010000A4-     	  dd  400,410,420,430,440,450,460,470,480,490,500
+    47 0000010D 010000AE010000B801-
+    48 00000116 0000C2010000CC0100-
+    49 0000011F 00D6010000E0010000-
+    50 00000128 EA010000F4010000   
+    51                                  len3:   EQU     ($-array3)/4
+    52                                  
+    53                                  SECTION .bss
+    54                                  ; define uninitialized data here
+    55                                  
+    56                                  SECTION .text
+    57                                  global _main
+    58                                  _main:
+    59                                  ;;;;;;;;;
+    60                                  ;;;;;;;;;
+    61                                  ;;;;;;;;;
+    62                                  ;each array will be ran at a different break. Array1 will run default, Array2 after break 2, Array3 after break3
+    63 00000000 B8[00000000]            	mov eax, array1
+    64 00000005 BB05000000              	mov ebx,len1
+    65 0000000A E82A000000              	call reverse
+    66                                  breakarray2:
+    67 0000000F B8[14000000]            	mov eax, array2
+    68 00000014 BB14000000              	mov ebx, len2
+    69 00000019 E81B000000              	call reverse
+    70                                  breakarray3:
+    71 0000001E B8[64000000]            	mov eax, array3
+    72 00000023 BB33000000              	mov ebx, len3
+    73 00000028 E80C000000              	call reverse
+    74                                  lastBreak:
+    75                                  ; put your code here.
+    76                                  
+    77                                  
+    78                                  
+    79                                  ; Normal termination code
+    80 0000002D B801000000              mov eax, 1
+    81 00000032 BB00000000              mov ebx, 0
+    82 00000037 CD80                    int 80h
+    83                                  
+    84                                  reverse:
+    85 00000039 31F6                    	xor esi, esi
+    86                                  	;zero out the esi register
+    87 0000003B 31FF                    	xor edi, edi
+    88                                  	;zero out the edi register
+    89                                  	
+    90                                  	push:
+    91 0000003D 39DE                    		cmp esi, ebx
+    92                                  	;compare esi to the len of the array in the ebx reg
+    93 0000003F 7D07                    		jge pop
+    94                                  	;if larger than the len array jump to pop
+    95 00000041 8B14B0                  		mov edx, DWORD [eax + esi * 4]
+    96 00000044 52                      		push edx
+    97 00000045 46                      		inc esi
+    98 00000046 EBF5                    		jmp push
+    99                                  	pop:
+   100 00000048 39DF                    		cmp edi, ebx
+   101                                  	;similar to push but uses edi register rather than esi
+   102 0000004A 7D07                    		jge done
+   103                                  	;exit the loop
+   104 0000004C 5A                      		pop edx
+   105 0000004D 8914B8                  		mov DWORD [eax + edi * 4], edx
+   106 00000050 47                      		inc edi
+   107 00000051 EBF5                    		jmp pop
+   108                                  	done:
+   109 00000053 BE00000000              		mov esi, 0
+   110 00000058 BF00000000              		mov edi, 0
+   111                                  	;
+   112 0000005D C3                      ret
